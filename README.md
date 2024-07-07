@@ -70,7 +70,7 @@ def main(host, ports):
 
 By defining the number of threads we want, we can have our ```worker()``` queue up ports for scanning. The worker first gets a port number from the queue, scans it, and completes the scan. Our ```main()``` function, however, is what fills up the queue with port numbers.
 
-At 200 threads with a 0.2 second timeout, the same task that took 18 hours to complete can suddenly be done in under two minutes. A scan of well-known ports can be done in just a few seconds. And, finally, scanning the registered port range can happen in a little over 30 seconds.
+At 200 threads with a 0.2 second timeout, the same task that took 18 hours to complete can suddenly be done in under two minutes. A scan of well-known ports can be done in just a few seconds. And, finally, scanning the registered port range can happen in a little over 30 seconds. However, running the optimal number of threads is requires a bit of trial and error. At 1000 threads, my CPU utilization quickly reaches 100% for long periods of time during the scan. So, I've found that setting N_THREADS to 400 is a good middle ground for speed and CPU utilization. After all, the scanner shouldn't lock up your computer.
 
 ## A Final Note On Scanning
 
