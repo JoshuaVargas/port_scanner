@@ -3,22 +3,32 @@ import time
 from threading import Thread
 from queue import Queue
 
-N_THREADS = 400
+N_THREADS = 512
 q = Queue()
 
 def get_banner(s):
-    return s.recv(1024).decode().strip('\n')
+    return s.recv(1024)
 
 def scan_port(port):
     try:
         sock = socket.socket()
         sock.settimeout(2)
         sock.connect((host, port))
-        try:
-            banner = get_banner(sock)
-            print(f"    [+] Open Port: {host}:{port}" + " | " + str(banner))
-        except:
-            print(f"    [+] Open Port {host}:{port}")
+        if port == 80:
+            try:
+                http_request = f"GET / HTTP/1.1\r\nHost: {host}\r\n\r\n"
+                sock.send(http_request.encode())
+                banner = sock.recv(1024).decode("utf-8")
+                print(f"    [+] Open Port {host}:{port}\n{banner}")
+            except:
+                print("Failed to grab HTTP Response Code")
+                print(f"    [+] Open Port {host}:{port} | No banner grabbed!")
+        else:
+            try:
+                banner = sock.recv(1024).decode("utf-8")
+                print(f"    [+] Open Port: {host}:{port}\n{banner}")
+            except:
+                print(f"    [+] Open Port {host}:{port} | No banner grabbed!")
     except:
         pass
     finally:
@@ -60,11 +70,12 @@ ______          _   _____
     print("Separate all values with commas (e.g. 192.168.1.1,google.com)")
     hosts = input('[+] Enter Host Domain Names or IP Addresses: ')
     scan_type = input(f"""
-[1] Well-Known Port Scan (1,1024) [~6sec]
-[2] Registered Port Scan (1025,49151) [~240sec]
-[3] Ephemeral Port Scan (49152,65535) [~80sec]
-[4] Custom Range (e.g. 22,80)
-                
+[1] Well-Known Port Scan (1,1024)     [~4sec]
+[2] Registered Port Scan (1025,49151) [~190sec]
+[3] Ephemeral Port Scan (49152,65535) [~70sec]
+[4] Full Scan (1,65535)               [~270sec]
+[5] Custom Range (e.g. 22,80)         [~4.2 sec per 1024 ports]
+
 [+] Select Scan Type: """)
     
     match scan_type:
@@ -74,6 +85,8 @@ ______          _   _____
             port_range = ("1025,49151")
         case "3":
             port_range = ("49152,65535")
+        case "4":
+            port_range = ("1,65535")
         case _:
             port_range = input('\n[+] Enter Port Range: ')
 
