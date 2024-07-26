@@ -17,7 +17,7 @@ Open ports can often leak valuable information to attackers regarding services r
 import socket
 
 def get_banner(s):
-    return s.recv(1024).decode().strip('\n')
+    return s.recv(1024).decode()
 
 def scan_ports(port):
     try:
@@ -26,7 +26,7 @@ def scan_ports(port):
         sock.connect((host, port))
         try:
             banner = get_banner(sock)
-            print(f"    [+] Open Port: {host}:{port}" + " | " + str(banner))
+            print(f"    [+] Open Port: {host}:{port}\n(banner)")
         except:
             print(f"    [+] Open Port {host}:{port}")
     except:
