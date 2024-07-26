@@ -1,3 +1,6 @@
+![Screenshot 2024-07-07 035236](https://github.com/JoshuaVargas/port_scanner/assets/13924477/050cbfc0-3806-46a8-a9b5-9404c7f98bad)
+
+
 # Port Scanning and Banner Grabbing
 
 At the heart of information assurance is inventory management. You cannot protect something that you do not know is there. Thus, it's important to understand what information you're leaking to the greater public.
