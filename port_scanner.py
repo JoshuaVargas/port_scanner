@@ -1,4 +1,5 @@
 import socket
+import ssl
 import time
 from threading import Thread
 from queue import Queue
@@ -6,12 +7,9 @@ from queue import Queue
 N_THREADS = 512
 q = Queue()
 
-def get_banner(s):
-    return s.recv(1024)
-
 def scan_port(port):
     try:
-        sock = socket.socket()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(2)
         sock.connect((host, port))
         if port == 80:
@@ -19,6 +17,19 @@ def scan_port(port):
                 http_request = f"GET / HTTP/1.1\r\nHost: {host}\r\n\r\n"
                 sock.send(http_request.encode())
                 banner = sock.recv(1024).decode("utf-8")
+                print(f"    [+] Open Port {host}:{port}\n{banner}")
+            except:
+                print("Failed to grab HTTP Response Code")
+                print(f"    [+] Open Port {host}:{port} | No banner grabbed!")
+        elif port == 443:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                ssl_context = ssl.create_default_context()
+                ssl_socket = ssl_context.wrap_socket(s, server_hostname=host)
+                ssl_socket.connect((host, port))
+                http_request = f"GET / HTTP/1.1\r\nHost: {host}\r\n\r\n"
+                ssl_socket.send(http_request.encode())
+                banner = ssl_socket.recv(1024).decode("utf-8")
                 print(f"    [+] Open Port {host}:{port}\n{banner}")
             except:
                 print("Failed to grab HTTP Response Code")
